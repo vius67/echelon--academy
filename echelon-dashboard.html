@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Echelon — Student Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sage:        #7fa882;
+  --sage-light:  #b5cfb7;
+  --sage-pale:   #e8f0e9;
+  --sage-deep:   #4a7a4d;
+  --sage-mid:    #5e9162;
+  --cream:       #faf8f3;
+  --cream-warm:  #f2ede4;
+  --gold:        #c9963a;
+  --gold-light:  #e8b84b;
+  --ink:         #1a2e1b;
+  --ink-mid:     #3d5c40;
+  --ink-soft:    #6b8a6e;
+  --white:       #ffffff;
+  --radius:      14px;
+  --nav-w:       220px;
+  --nav-w-col:   60px;
+  --danger:      #e05252;
+  --warn:        #d4862a;
+  --success:     #4a7a4d;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);overflow-x:hidden;min-height:100vh}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(74,122,77,0.25);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:rgba(74,122,77,0.45)}
+
+/* ── BACKGROUND ── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 50% at 10% 5%,  rgba(127,168,130,0.14) 0%,transparent 55%),
+    radial-gradient(ellipse 60% 45% at 90% 95%,  rgba(74,122,77,0.10)  0%,transparent 50%),
+    radial-gradient(ellipse 40% 35% at 55% 50%,  rgba(181,207,183,0.08) 0%,transparent 45%),
+    var(--cream);
+}
+
+/* ── DOT GRID ── */
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(127,168,130,0.28) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+
+/* ── GLASS ── */
+.glass{
+  background:rgba(255,255,255,0.72);
+  backdrop-filter:blur(40px) saturate(1.8);
+  -webkit-backdrop-filter:blur(40px) saturate(1.8);
+  border:1px solid rgba(255,255,255,0.88);
+  box-shadow:0 2px 20px rgba(74,122,77,0.08),inset 0 1.5px 0 rgba(255,255,255,1);
+  border-radius:var(--radius);
+}
+.glass:hover{
+  box-shadow:0 12px 40px rgba(74,122,77,0.12),inset 0 1.5px 0 rgba(255,255,255,1);
+  border-color:rgba(127,168,130,0.3);
+}
+
+/* ── LAYOUT ── */
+#app{display:flex;min-height:100vh;position:relative;z-index:1}
+
+/* ── SIDEBAR ── */
+#sidebar{
+  position:fixed;left:12px;top:12px;bottom:12px;
+  width:var(--nav-w-col);
+  background:rgba(255,255,255,0.82);
+  backdrop-filter:blur(64px) saturate(2.2);
+  -webkit-backdrop-filter:blur(64px) saturate(2.2);
+  border:1px solid rgba(255,255,255,0.92);
+  border-radius:20px;
+  box-shadow:0 4px 40px rgba(74,122,77,0.12),inset 0 1.5px 0 rgba(255,255,255,1);
+  transition:width 0.36s cubic-bezier(0.34,1.2,0.64,1);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  padding:14px 10px;
+  gap:0;
+  z-index:50;
+}
+#sidebar.expanded{width:var(--nav-w)}
+.sidebar-logo{
+  display:flex;align-items:center;gap:10px;
+  padding:4px 2px 14px;
+  border-bottom:1px solid rgba(127,168,130,0.15);
+  margin-bottom:10px;
+  text-decoration:none;
+  flex-shrink:0;overflow:hidden;
+}
+.logo-box{
+  width:34px;height:34px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--sage-deep),var(--sage));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 12px rgba(74,122,77,0.38);
+}
+.logo-text{
+  font-family:'Playfair Display',serif;font-size:13.5px;font-weight:700;
+  color:var(--ink);letter-spacing:0.05em;white-space:nowrap;
+  opacity:0;transform:translateX(-6px);
+  transition:opacity 0.18s,transform 0.18s;
+}
+.logo-text span{color:var(--gold)}
+#sidebar.expanded .logo-text{opacity:1;transform:translateX(0)}
+
+.nav-items{flex:1;display:flex;flex-direction:column;gap:3px;overflow:hidden}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;
+  border-radius:12px;text-decoration:none;
+  font-size:13px;font-weight:450;
+  color:var(--ink-soft);
+  border:1px solid transparent;
+  transition:all 0.18s ease;
+  white-space:nowrap;cursor:pointer;
+  position:relative;overflow:hidden;
+  background:none;font-family:'DM Sans',sans-serif;
+}
+.nav-item:hover{background:rgba(127,168,130,0.1);color:var(--ink-mid)}
+.nav-item.active{
+  background:linear-gradient(135deg,rgba(74,122,77,0.14),rgba(127,168,130,0.08));
+  color:var(--sage-deep);font-weight:600;
+  border-color:rgba(74,122,77,0.18);
+  box-shadow:0 2px 10px rgba(74,122,77,0.12),inset 0 1px 0 rgba(255,255,255,0.9);
+}
+.nav-item.active::before{
+  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:3px;height:18px;border-radius:3px;
+  background:linear-gradient(to bottom,var(--sage-deep),var(--sage));
+}
+.nav-icon{width:16px;height:16px;flex-shrink:0;opacity:0.7}
+.nav-item.active .nav-icon{opacity:1;color:var(--sage-deep)}
+.nav-label{opacity:0;transform:translateX(-4px);transition:opacity 0.16s 0.04s,transform 0.16s 0.04s}
+#sidebar.expanded .nav-label{opacity:1;transform:translateX(0)}
+
+.sidebar-bottom{
+  display:flex;flex-direction:column;gap:6px;
+  padding-top:10px;border-top:1px solid rgba(127,168,130,0.12);
+  flex-shrink:0;
+}
+.clock-chip{
+  display:flex;align-items:center;gap:8px;padding:7px 10px;
+  border-radius:11px;
+  background:rgba(127,168,130,0.08);
+  border:1px solid rgba(127,168,130,0.15);overflow:hidden;
+}
+.clock-text{
+  font-family:'DM Mono',monospace;font-size:12px;color:var(--ink-soft);
+  white-space:nowrap;
+  opacity:0;transition:opacity 0.15s;
+}
+#sidebar.expanded .clock-text{opacity:1}
+
+/* ── MAIN ── */
+#main{flex:1;padding-left:calc(var(--nav-w-col) + 24px);padding-top:0;min-width:0;transition:padding-left 0.36s cubic-bezier(0.34,1.2,0.64,1)}
+#sidebar.expanded ~ #main{padding-left:calc(var(--nav-w) + 24px)}
+.page{padding:36px 40px;max-width:1200px;margin:0 auto;animation:pageIn 0.38s cubic-bezier(0.22,1,0.36,1) both}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CARDS ── */
+.card{
+  background:rgba(255,255,255,0.72);
+  backdrop-filter:blur(40px) saturate(1.8);
+  -webkit-backdrop-filter:blur(40px) saturate(1.8);
+  border:1px solid rgba(255,255,255,0.88);
+  box-shadow:0 2px 16px rgba(74,122,77,0.07),inset 0 1.5px 0 rgba(255,255,255,1);
+  border-radius:var(--radius);
+  transition:box-shadow 0.28s,border-color 0.28s;
+  position:relative;overflow:hidden;
+}
+.card:hover{
+  box-shadow:0 10px 36px rgba(74,122,77,0.12),inset 0 1.5px 0 rgba(255,255,255,1);
+  border-color:rgba(127,168,130,0.28);
+}
+
+/* ── EYEBROW ── */
+.eyebrow{
+  font-family:'DM Mono',monospace;font-size:10.5px;font-weight:500;
+  letter-spacing:0.15em;text-transform:uppercase;color:var(--sage-deep);
+  margin-bottom:5px;
+}
+
+/* ── BUTTONS ── */
+.btn{
+  padding:8px 18px;border-radius:8px;border:none;font-family:'DM Sans',sans-serif;
+  font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;
+}
+.btn-primary{background:var(--sage-deep);color:white;box-shadow:0 3px 14px rgba(74,122,77,0.3)}
+.btn-primary:hover{background:var(--ink);box-shadow:0 6px 20px rgba(26,46,27,0.2);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--ink-mid);border:1.5px solid rgba(127,168,130,0.4)}
+.btn-ghost:hover{background:rgba(127,168,130,0.1);border-color:var(--sage)}
+.btn-danger{background:rgba(224,82,82,0.1);color:var(--danger);border:1px solid rgba(224,82,82,0.25)}
+.btn-danger:hover{background:rgba(224,82,82,0.18)}
+.btn-sm{padding:5px 12px;font-size:12px}
+
+/* ── INPUTS ── */
+.input{
+  background:rgba(255,255,255,0.85);border:1.5px solid rgba(127,168,130,0.25);
+  border-radius:9px;padding:9px 13px;font-family:'DM Sans',sans-serif;
+  font-size:13.5px;color:var(--ink);outline:none;width:100%;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.input:focus{border-color:var(--sage-deep);box-shadow:0 0 0 3px rgba(74,122,77,0.12)}
+select.input option{background:white;color:var(--ink)}
+textarea.input{resize:vertical;min-height:72px}
+
+/* ── TAGS ── */
+.tag{
+  display:inline-block;padding:2px 8px;border-radius:5px;
+  font-family:'DM Mono',monospace;font-size:10.5px;font-weight:500;
+  background:var(--sage-pale);color:var(--sage-deep);letter-spacing:0.05em;
+}
+
+/* ── SKELETON ── */
+.skel{
+  background:linear-gradient(90deg,rgba(127,168,130,0.07) 25%,rgba(127,168,130,0.13) 50%,rgba(127,168,130,0.07) 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.8s ease infinite;
+  border-radius:8px;
+}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.94) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.fade-up{animation:fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) both}
+
+/* ── PROGRESS RING ── */
+.ring-track{fill:none;stroke:rgba(127,168,130,0.15);stroke-width:5}
+.ring-fill{fill:none;stroke-width:5;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset 0.6s cubic-bezier(0.22,1,0.36,1),stroke 0.4s}
+
+/* ── PROGRESS BAR ── */
+.prog-bar{height:5px;background:rgba(127,168,130,0.15);border-radius:6px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--sage-deep),var(--sage));border-radius:6px;transition:width 0.7s cubic-bezier(0.22,1,0.36,1)}
+
+/* ── MODAL ── */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(26,46,27,0.3);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;
+  animation:fadeIn 0.18s ease;
+}
+.modal{
+  background:rgba(255,255,255,0.97);border:1px solid rgba(255,255,255,1);
+  border-radius:20px;padding:28px;width:460px;max-width:96vw;max-height:88vh;
+  overflow-y:auto;box-shadow:0 28px 70px rgba(26,46,27,0.2);
+  animation:scaleIn 0.28s cubic-bezier(0.22,1,0.36,1);
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ── TOPBAR ── */
+#topbar{
+  position:sticky;top:0;z-index:40;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 40px;
+  background:rgba(250,248,243,0.85);
+  backdrop-filter:blur(32px);
+  -webkit-backdrop-filter:blur(32px);
+  border-bottom:1px solid rgba(127,168,130,0.15);
+  margin-left:calc(var(--nav-w-col) + 12px);
+  transition:margin-left 0.36s cubic-bezier(0.34,1.2,0.64,1);
+}
+body.nav-open #topbar{margin-left:calc(var(--nav-w) + 12px)}
+.topbar-left h1{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--ink);line-height:1.1}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-time{font-family:'DM Mono',monospace;font-size:12px;color:var(--ink-soft);padding:5px 12px;background:rgba(127,168,130,0.1);border-radius:20px;border:1px solid rgba(127,168,130,0.2)}
+
+/* ── CHECKLIST ITEM ── */
+.ci-item{
+  display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;
+  border:1px solid rgba(127,168,130,0.15);background:rgba(255,255,255,0.55);
+  cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;
+}
+.ci-item:hover{background:rgba(255,255,255,0.8)}
+.ci-item.done{background:rgba(127,168,130,0.06);border-color:rgba(127,168,130,0.2)}
+.ci-check{
+  width:20px;height:20px;border-radius:50%;flex-shrink:0;
+  border:2px solid rgba(127,168,130,0.4);background:transparent;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1);
+}
+.ci-item.done .ci-check{background:var(--sage-deep);border-color:var(--sage-deep);box-shadow:0 2px 8px rgba(74,122,77,0.35)}
+
+/* ── HW ROW ── */
+.hw-row{
+  display:flex;align-items:center;gap:10px;padding:10px 13px;
+  background:rgba(255,255,255,0.6);border-radius:10px;
+  border:1px solid rgba(255,255,255,0.82);transition:all 0.2s;
+}
+.hw-row:hover{background:rgba(255,255,255,0.85);border-color:rgba(127,168,130,0.2)}
+.hw-row.done{opacity:0.5}
+.hw-row.done .hw-title{text-decoration:line-through}
+
+/* ── TODO KANBAN ── */
+.kanban-board{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:start}
+.kanban-col{
+  background:rgba(255,255,255,0.45);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,0.75);border-radius:var(--radius);
+  padding:14px;min-height:200px;
+  transition:background 0.2s,box-shadow 0.2s;
+}
+.kanban-col.drag-over{background:rgba(127,168,130,0.08);box-shadow:inset 0 0 0 2px rgba(74,122,77,0.2)}
+.kanban-card{
+  background:rgba(255,255,255,0.88);border:1px solid rgba(255,255,255,0.95);
+  border-radius:11px;padding:11px 13px;cursor:grab;
+  transition:all 0.2s ease;margin-bottom:8px;
+  box-shadow:0 1px 6px rgba(74,122,77,0.05),inset 0 1px 0 rgba(255,255,255,0.95);
+}
+.kanban-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(74,122,77,0.1)}
+.kanban-card:active{cursor:grabbing}
+
+/* ── TIMER RING ── */
+.timer-ring-track{fill:none;stroke:rgba(127,168,130,0.15);stroke-width:10}
+.timer-ring-fill{fill:none;stroke-width:10;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;stroke:var(--sage-deep);transition:stroke-dashoffset 0.5s linear}
+
+/* ── COUNTDOWN ── */
+.cd-box{
+  text-align:center;flex:1;
+  background:rgba(255,255,255,0.72);border-radius:10px;padding:8px 6px;
+  border:1px solid rgba(255,255,255,0.9);
+}
+.cd-num{font-family:'DM Mono',monospace;font-size:20px;font-weight:700;color:var(--sage-deep);line-height:1}
+.cd-lbl{font-size:9px;color:var(--ink-soft);margin-top:3px;font-weight:600;letter-spacing:0.06em;font-family:'DM Mono',monospace}
+
+/* ── PRIORITY DOT ── */
+.prio-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* ── STAT CARD ── */
+.stat-card{padding:20px 22px;transition:all 0.3s}
+.stat-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 3px 12px rgba(0,0,0,0.1)}
+.stat-num{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--ink);line-height:1;margin-bottom:12px}
+
+/* ── CALENDAR ── */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px}
+.cal-day{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;font-size:12px;cursor:pointer;
+  transition:all 0.18s;color:var(--ink-soft);font-weight:450;
+}
+.cal-day:hover{background:rgba(127,168,130,0.15);color:var(--ink)}
+.cal-day.today{background:var(--sage-deep);color:white;font-weight:700;box-shadow:0 2px 10px rgba(74,122,77,0.35)}
+.cal-day.has-hw{position:relative}
+.cal-day.has-hw::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--gold)}
+
+/* ── STUDY HISTORY ── */
+.history-day{
+  display:flex;align-items:center;gap:10px;padding:9px 12px;
+  background:rgba(255,255,255,0.55);border-radius:9px;border:1px solid rgba(255,255,255,0.8);
+}
+.history-dot{
+  width:10px;height:10px;border-radius:50%;flex-shrink:0;
+}
+.check-mark{display:inline-block;width:11px;height:11px}
+.check-mark path{stroke:white;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none}
+
+/* ── RESPONSIVE ── */
+@media(max-width:767px){
+  #sidebar{display:none}
+  #main{padding-left:0}
+  .page{padding:20px 16px}
+  .kanban-board{grid-template-columns:1fr}
+  #topbar{margin-left:0;padding:12px 16px}
+  body.nav-open #topbar{margin-left:0}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-box">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="1" y="1" width="6" height="6" rx="1.5" fill="white" fill-opacity=".95"/>
+          <rect x="9" y="1" width="6" height="6" rx="1.5" fill="white" fill-opacity=".95"/>
+          <rect x="1" y="9" width="6" height="6" rx="1.5" fill="white" fill-opacity=".95"/>
+          <rect x="9" y="9" width="6" height="6" rx="1.5" fill="white" fill-opacity=".35"/>
+        </svg>
+      </div>
+      <span class="logo-text">ECHE<span>LON</span></span>
+    </div>
+
+    <nav class="nav-items">
+      <button class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="2" y="2" width="7" height="7" rx="2"/><rect x="11" y="2" width="7" height="7" rx="2"/><rect x="2" y="11" width="7" height="7" rx="2"/><rect x="11" y="11" width="7" height="7" rx="2"/></svg>
+        <span class="nav-label">Dashboard</span>
+      </button>
+      <button class="nav-item" onclick="navigate('homework')" id="nav-homework">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 3h9a2 2 0 012 2v11a2 2 0 01-2 2H4a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M15 14h1a1 1 0 000-2h-1"/><path d="M7 7h5M7 10h5M7 13h3"/></svg>
+        <span class="nav-label">Homework</span>
+      </button>
+      <button class="nav-item" onclick="navigate('todos')" id="nav-todos">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3" y="3" width="14" height="14" rx="3.5"/><path d="M7 10l2.5 2.5L13 8"/></svg>
+        <span class="nav-label">To-do</span>
+      </button>
+      <button class="nav-item" onclick="navigate('papers')" id="nav-papers">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 17V9l4-4 4 4 4-6"/><path d="M3 17h14"/></svg>
+        <span class="nav-label">Past Papers</span>
+      </button>
+      <button class="nav-item" onclick="navigate('calendar')" id="nav-calendar">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3" y="4" width="14" height="14" rx="3"/><path d="M3 8h14M7 2v4M13 2v4"/></svg>
+        <span class="nav-label">Calendar</span>
+      </button>
+      <button class="nav-item" onclick="navigate('timer')" id="nav-timer">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><path d="M10 6.5v3.5l2 2"/></svg>
+        <span class="nav-label">Timer</span>
+      </button>
+      <button class="nav-item" onclick="navigate('checkin')" id="nav-checkin">
+        <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M10 2l1.8 3.6L16 6.2l-3 2.9.7 4.1L10 11.1l-3.7 2.1.7-4.1L4 6.2l4.2-.6L10 2z"/></svg>
+        <span class="nav-label">Daily Check-in</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="clock-chip">
+        <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" style="flex-shrink:0;color:var(--ink-soft)"><circle cx="10" cy="10" r="7"/><path d="M10 6.5v3.5l2 2"/></svg>
+        <span class="clock-text" id="sidebarClock">00:00</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div id="main">
+    <!-- TOPBAR -->
+    <div id="topbar">
+      <div class="topbar-left">
+        <div class="eyebrow" id="topbarEyebrow">Overview</div>
+        <h1 id="topbarTitle">Dashboard</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-time" id="topbarClock">00:00</div>
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Add</button>
+      </div>
+    </div>
+
+    <!-- PAGES -->
+    <div id="pageContent"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modalBg" class="modal-bg" style="display:none" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────
+const state = {
+  page: 'dashboard',
+  homework: JSON.parse(localStorage.getItem('ec_hw') || '[]'),
+  todos: JSON.parse(localStorage.getItem('ec_todos') || '[]'),
+  papers: JSON.parse(localStorage.getItem('ec_papers') || '[]'),
+  checkins: JSON.parse(localStorage.getItem('ec_checkins') || '[]'),
+  sessions: JSON.parse(localStorage.getItem('ec_sessions') || '[]'),
+  kanbanCols: JSON.parse(localStorage.getItem('ec_kcols') || 'null') || [
+    {id:'todo',label:'To Do',color:'#4a7a4d'},
+    {id:'in_progress',label:'In Progress',color:'#c9963a'},
+    {id:'done',label:'Done',color:'#7fa882'},
+  ],
+  timer: {running:false, secsLeft:25*60, total:25*60, subject:'', intervalId:null},
+  countdown: {d:0,h:0,m:0,s:0,intervalId:null},
+}
+
+const SUBJECTS = ['Mathematics','English','Physics','Chemistry','Biology','Science','History','Geography','German','OC Prep','Selective Prep','General Ability','Other']
+const SUBJECT_COLOR = {Mathematics:'#4a7a4d',English:'#c9963a',Physics:'#5e7fa8',Chemistry:'#7a5ea8',Biology:'#5ea87a',Science:'#4a7a6e',History:'#a87a5e',Geography:'#5e8aa8',German:'#a8875e','OC Prep':'#7a4a7a','Selective Prep':'#7a4a4a','General Ability':'#4a7a7a',Other:'#7a7a7a'}
+const subjectColor = s => SUBJECT_COLOR[s] || '#7fa882'
+const TODAY = () => new Date().toISOString().split('T')[0]
+
+function save(key, data){ localStorage.setItem('ec_'+key, JSON.stringify(data)) }
+function genId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6) }
+
+// ── CLOCK ──────────────────────────────────────────────────────────────────
+function tickClock(){
+  const t = new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})
+  document.getElementById('sidebarClock').textContent = t
+  document.getElementById('topbarClock').textContent = t
+}
+tickClock(); setInterval(tickClock, 1000)
+
+// ── SIDEBAR HOVER ──────────────────────────────────────────────────────────
+const sidebar = document.getElementById('sidebar')
+sidebar.addEventListener('mouseenter', ()=>{ sidebar.classList.add('expanded'); document.body.classList.add('nav-open') })
+sidebar.addEventListener('mouseleave', ()=>{ sidebar.classList.remove('expanded'); document.body.classList.remove('nav-open') })
+
+// ── NAVIGATION ─────────────────────────────────────────────────────────────
+function navigate(page){
+  state.page = page
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'))
+  const el = document.getElementById('nav-'+page)
+  if(el) el.classList.add('active')
+  const titles = {dashboard:'Dashboard',homework:'Homework',todos:'To-do',papers:'Past Papers',calendar:'Calendar',timer:'Study Timer',checkin:'Daily Check-in'}
+  const eyebrows = {dashboard:'Overview',homework:'Track',todos:'Tasks',papers:'Practice',calendar:'Schedule',timer:'Focus',checkin:'Habits'}
+  document.getElementById('topbarTitle').textContent = titles[page]||page
+  document.getElementById('topbarEyebrow').textContent = eyebrows[page]||''
+  renderPage(page)
+  window.scrollTo({top:0,behavior:'smooth'})
+}
+
+function renderPage(page){
+  const el = document.getElementById('pageContent')
+  el.innerHTML = ''
+  const div = document.createElement('div')
+  div.className = 'page'
+  switch(page){
+    case 'dashboard': div.innerHTML = renderDashboard(); break
+    case 'homework':  div.innerHTML = renderHomework(); break
+    case 'todos':     div.innerHTML = renderTodos(); break
+    case 'papers':    div.innerHTML = renderPapers(); break
+    case 'calendar':  div.innerHTML = renderCalendar(); break
+    case 'timer':     div.innerHTML = renderTimer(); break
+    case 'checkin':   div.innerHTML = renderCheckin(); break
+    default:          div.innerHTML = '<p>Page not found</p>'
+  }
+  el.appendChild(div)
+  afterRender(page)
+}
+
+// ── GREETING ───────────────────────────────────────────────────────────────
+function getGreeting(){
+  const h = new Date().getHours()
+  if(h<5) return 'Still up?'
+  if(h<12) return 'Good morning'
+  if(h<17) return 'Good afternoon'
+  return 'Good evening'
+}
+
+// ── DUE LABEL ──────────────────────────────────────────────────────────────
+function dueLabel(due){
+  if(!due) return null
+  const diff = Math.ceil((new Date(due+'T00:00').getTime()-new Date().setHours(0,0,0,0))/86400000)
+  if(diff<0) return {label:'Overdue',color:'#e05252',bg:'rgba(224,82,82,0.1)'}
+  if(diff===0) return {label:'Today',color:'#c9963a',bg:'rgba(201,150,58,0.12)'}
+  if(diff===1) return {label:'Tomorrow',color:'#c9963a',bg:'rgba(201,150,58,0.07)'}
+  return {label:`${diff}d`,color:'var(--ink-soft)',bg:'rgba(127,168,130,0.08)'}
+}
+
+// ── CHECKIN HELPERS ────────────────────────────────────────────────────────
+const CI_ITEMS = [
+  {key:'maths',label:'Mathematics',sub:'Problem sets and exam prep',time:'1h'},
+  {key:'english',label:'English',sub:'Reading, writing and comprehension',time:'45m'},
+  {key:'thinking',label:'Thinking Skills',sub:'Abstract reasoning and logic',time:'30m'},
+  {key:'oc',label:'OC Prep',sub:'Past papers and technique',time:'30m'},
+  {key:'selective',label:'Selective Prep',sub:'Full exam simulation',time:'45m'},
+]
+function getTodayCI(){
+  return state.checkins.find(c=>c.date===TODAY()) || null
+}
+function countDone(ci){ return ci ? CI_ITEMS.filter(i=>ci[i.key]).length : 0 }
+function calcStreak(){
+  let streak=0, d=new Date()
+  while(true){
+    const ds = d.toISOString().split('T')[0]
+    const c = state.checkins.find(x=>x.date===ds)
+    if(!c||countDone(c)===0) break
+    streak++
+    d.setDate(d.getDate()-1)
+  }
+  return streak
+}
+
+// ── DASHBOARD ──────────────────────────────────────────────────────────────
+function renderDashboard(){
+  const hw = state.homework
+  const todos = state.todos
+  const papers = state.papers
+  const hwDone = hw.filter(h=>h.completed).length
+  const todoDone = todos.filter(t=>t.completed).length
+  const hwPct = hw.length>0?Math.round((hwDone/hw.length)*100):0
+  const todoPct = todos.length>0?Math.round((todoDone/todos.length)*100):0
+  const todayCI = getTodayCI()
+  const todayDone = countDone(todayCI)
+  const streak = calcStreak()
+  const upcoming = hw.filter(h=>!h.completed&&h.due_date).sort((a,b)=>new Date(a.due_date)-new Date(b.due_date)).slice(0,6)
+  const openTodos = todos.filter(t=>!t.completed).slice(0,4)
+  const nextHW = upcoming[0]||null
+
+  const date = new Date().toLocaleDateString('en-AU',{weekday:'long',month:'long',day:'numeric'})
+
+  return `
+  <div style="margin-bottom:28px" class="fade-up">
+    <div class="eyebrow" style="color:var(--sage-deep)">Echelon Study Co.</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--ink);margin-bottom:4px">${getGreeting()}</h2>
+    <p style="font-size:13px;color:var(--ink-soft)">${date}${todayDone>0?` · ${todayDone}/5 daily tasks done`:''}</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px">
+    <div class="card stat-card fade-up" onclick="navigate('homework')" style="cursor:pointer;animation-delay:0ms">
+      <div class="stat-icon" style="background:linear-gradient(135deg,var(--sage-deep),var(--sage))">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round"><path d="M4 3h9a2 2 0 012 2v11a2 2 0 01-2 2H4a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M7 7h5M7 10h5M7 13h3"/></svg>
+      </div>
+      <div class="eyebrow">Homework</div>
+      <div class="stat-num">${hwDone}<span style="font-size:14px;font-weight:400;color:var(--ink-soft);margin-left:4px">/ ${hw.length}</span></div>
+      ${hw.length>0?`<div class="prog-bar"><div class="prog-fill" style="width:${hwPct}%"></div></div><div style="font-size:11px;color:var(--ink-soft);margin-top:5px">${hwPct}% complete</div>`:'<div style="font-size:11px;color:var(--ink-soft)">No tasks yet</div>'}
+    </div>
+
+    <div class="card stat-card fade-up" onclick="navigate('todos')" style="cursor:pointer;animation-delay:60ms">
+      <div class="stat-icon" style="background:linear-gradient(135deg,var(--gold),var(--gold-light))">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round"><rect x="3" y="3" width="14" height="14" rx="3.5"/><path d="M7 10l2.5 2.5L13 8"/></svg>
+      </div>
+      <div class="eyebrow">To-do</div>
+      <div class="stat-num">${todoDone}<span style="font-size:14px;font-weight:400;color:var(--ink-soft);margin-left:4px">/ ${todos.length}</span></div>
+      ${todos.length>0?`<div class="prog-bar"><div class="prog-fill" style="width:${todoPct}%;background:linear-gradient(90deg,var(--gold),var(--gold-light))"></div></div><div style="font-size:11px;color:var(--ink-soft);margin-top:5px">${todoPct}% complete</div>`:'<div style="font-size:11px;color:var(--ink-soft)">No tasks yet</div>'}
+    </div>
+
+    <div class="card stat-card fade-up" onclick="navigate('papers')" style="cursor:pointer;animation-delay:120ms">
+      <div class="stat-icon" style="background:linear-gradient(135deg,var(--ink-mid),var(--ink))">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round"><path d="M3 17V9l4-4 4 4 4-6"/><path d="M3 17h14"/></svg>
+      </div>
+      <div class="eyebrow">Past Papers</div>
+      <div class="stat-num">${papers.length}</div>
+      <div style="font-size:11px;color:var(--ink-soft)">papers logged</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1.15fr;gap:14px;margin-bottom:14px">
+    <!-- Daily Check-in -->
+    <div class="card fade-up" style="padding:20px 22px;animation-delay:180ms">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px">
+        <div>
+          <div class="eyebrow">Daily Habits</div>
+          <h3 style="font-size:14px;font-weight:650;color:var(--ink)">Today's Check-in</h3>
+        </div>
+        <div style="position:relative;width:48px;height:48px;flex-shrink:0">
+          <svg width="48" height="48" viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="19" class="ring-track"/>
+            <circle cx="24" cy="24" r="19" class="ring-fill"
+              stroke="${todayDone===5?'#4a7a4d':todayDone>=3?'#c9963a':'#7fa882'}"
+              stroke-dasharray="${2*Math.PI*19}"
+              stroke-dashoffset="${2*Math.PI*19*(1-(todayDone/5))}"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:var(--ink)">${todayDone}/5</div>
+        </div>
+      </div>
+      ${streak>0?`<div style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;background:rgba(201,150,58,0.1);border:1px solid rgba(201,150,58,0.22);margin-bottom:10px"><span style="font-size:11.5px;font-weight:600;color:var(--gold)">— ${streak} day streak</span></div>`:''}
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${CI_ITEMS.slice(0,3).map(item=>{
+          const done = todayCI?.[item.key]||false
+          return `<div class="ci-item${done?' done':''}" onclick="toggleCI('${item.key}')">
+            <div class="ci-check">${done?`<svg width="10" height="10" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`:''}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12.5px;font-weight:${done?'600':'450'};color:${done?'var(--ink)':'var(--ink-mid)'}">${item.label}</div>
+              <div style="font-size:11px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.sub}</div>
+            </div>
+            <span style="font-size:10px;font-family:'DM Mono',monospace;color:${done?'var(--sage-deep)':'var(--ink-soft)'};background:${done?'rgba(74,122,77,0.1)':'rgba(127,168,130,0.08)'};padding:2px 6px;border-radius:4px">${item.time}</span>
+          </div>`
+        }).join('')}
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="navigate('checkin')" style="margin-top:10px;width:100%">View full check-in</button>
+    </div>
+
+    <!-- Due Soon -->
+    <div class="card fade-up" style="padding:20px 22px;animation-delay:220ms">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div>
+          <div class="eyebrow">Homework</div>
+          <h3 style="font-size:14px;font-weight:650;color:var(--ink)">Due Soon</h3>
+        </div>
+        <button onclick="navigate('homework')" style="font-size:12px;color:var(--sage-deep);background:none;border:none;cursor:pointer;font-weight:500">View all →</button>
+      </div>
+      ${nextHW?`
+      <div style="margin-bottom:12px;padding:13px 15px;border-radius:12px;background:rgba(127,168,130,0.07);border:1px solid rgba(127,168,130,0.18)">
+        <div style="font-size:10px;font-family:'DM Mono',monospace;font-weight:600;color:var(--sage-deep);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Next due</div>
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${nextHW.title}</div>
+        ${nextHW.subject?`<span class="tag" style="margin-bottom:10px;display:inline-block">${nextHW.subject}</span>`:''}
+        <div style="display:flex;gap:7px;margin-top:8px" id="dashCountdown">
+          ${['d','h','m','s'].map(l=>`<div class="cd-box"><div class="cd-num" id="cd_${l}">--</div><div class="cd-lbl">${l}</div></div>`).join('')}
+        </div>
+      </div>`:''}
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${upcoming.length===0?`<div style="padding:20px 0;text-align:center;color:var(--ink-soft);font-size:13px">All clear — no upcoming homework</div>`
+        :upcoming.slice(0,4).map(hw=>{
+          const d = dueLabel(hw.due_date)
+          return `<div class="hw-row">
+            <div style="flex:1;min-width:0">
+              <div class="hw-title" style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${hw.title}</div>
+              ${hw.subject?`<span class="tag" style="margin-top:2px;display:inline-block">${hw.subject}</span>`:''}
+            </div>
+            ${d?`<span style="font-size:11px;color:${d.color};font-weight:600;background:${d.bg};padding:2px 7px;border-radius:5px;flex-shrink:0">${d.label}</span>`:''}
+          </div>`
+        }).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- Open Tasks -->
+  <div class="card fade-up" style="padding:20px 22px;animation-delay:260ms;margin-bottom:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <h3 style="font-size:13.5px;font-weight:650;color:var(--ink)">Open Tasks</h3>
+      <button onclick="navigate('todos')" style="font-size:12px;color:var(--sage-deep);background:none;border:none;cursor:pointer;font-weight:500">View all →</button>
+    </div>
+    ${openTodos.length===0?`<div style="padding:20px 0;text-align:center;color:var(--ink-soft);font-size:13px">Nothing pending — you are on top of everything</div>`
+    :`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:7px">
+      ${openTodos.map(t=>{
+        const pc = t.priority==='high'?'#e05252':t.priority==='medium'?'#c9963a':'#4a7a4d'
+        return `<div class="hw-row">
+          <div class="prio-dot" style="background:${pc};box-shadow:0 0 5px ${pc}55"></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.title}</div>
+            ${t.subject?`<span class="tag" style="margin-top:2px;display:inline-block">${t.subject}</span>`:''}
+          </div>
+        </div>`
+      }).join('')}
+    </div>`}
+  </div>
+
+  <!-- Quick Nav -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:40px">
+    ${[
+      {page:'papers',label:'Past Papers',icon:'<path d="M3 17V9l4-4 4 4 4-6"/><path d="M3 17h14"/>'},
+      {page:'calendar',label:'Calendar',icon:'<rect x="3" y="4" width="14" height="14" rx="3"/><path d="M3 8h14M7 2v4M13 2v4"/>'},
+      {page:'timer',label:'Study Timer',icon:'<circle cx="10" cy="10" r="7"/><path d="M10 6.5v3.5l2 2"/>'},
+      {page:'checkin',label:'Check-in',icon:'<path d="M10 2l1.8 3.6L16 6.2l-3 2.9.7 4.1L10 11.1l-3.7 2.1.7-4.1L4 6.2l4.2-.6L10 2z"/>'},
+    ].map((item,i)=>`
+    <div class="card fade-up" onclick="navigate('${item.page}')" style="padding:16px 12px;cursor:pointer;text-align:center;animation-delay:${360+i*40}ms">
+      <div style="display:flex;justify-content:center;color:var(--sage-deep);margin-bottom:7px">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">${item.icon}</svg>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--ink)">${item.label}</div>
+    </div>`).join('')}
+  </div>
+  `
+}
+
+// ── HOMEWORK ───────────────────────────────────────────────────────────────
+function renderHomework(){
+  const hw = state.homework.sort((a,b)=>{
+    if(!a.due_date&&!b.due_date) return 0
+    if(!a.due_date) return 1; if(!b.due_date) return -1
+    return new Date(a.due_date)-new Date(b.due_date)
+  })
+  const pending = hw.filter(h=>!h.completed)
+  const done = hw.filter(h=>h.completed)
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+    <div>
+      <div class="eyebrow">Track assignments</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--ink)">Homework</h2>
+    </div>
+    <button class="btn btn-primary" onclick="openHwForm()">+ Add Homework</button>
+  </div>
+
+  ${pending.length===0&&done.length===0?`<div class="card" style="padding:60px;text-align:center"><div style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ink-soft)">No homework yet.</div><p style="color:var(--ink-soft);font-size:13px;margin-top:6px">Add your first assignment to get started.</p></div>`:''}
+
+  ${pending.length>0?`
+  <div style="margin-bottom:20px">
+    <div class="eyebrow" style="margin-bottom:10px">Pending (${pending.length})</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${pending.map(h=>{
+        const d = dueLabel(h.due_date)
+        const sc = subjectColor(h.subject)
+        return `<div class="card" style="padding:14px 18px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:3px;height:36px;border-radius:3px;flex-shrink:0;background:${sc}"></div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:14px;font-weight:550;color:var(--ink)">${h.title}</div>
+              <div style="display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap">
+                ${h.subject?`<span class="tag">${h.subject}</span>`:''}
+                ${h.due_date?`<span style="font-size:11px;color:var(--ink-soft);font-family:'DM Mono',monospace">${h.due_date}</span>`:''}
+              </div>
+              ${h.notes?`<div style="font-size:12px;color:var(--ink-soft);margin-top:5px">${h.notes}</div>`:''}
+            </div>
+            <div style="display:flex;gap:7px;align-items:center;flex-shrink:0">
+              ${d?`<span style="font-size:11px;color:${d.color};font-weight:600;background:${d.bg};padding:3px 9px;border-radius:6px">${d.label}</span>`:''}
+              <button class="btn btn-primary btn-sm" onclick="toggleHW('${h.id}')">Done</button>
+              <button class="btn btn-ghost btn-sm" onclick="deleteHW('${h.id}')">Del</button>
+            </div>
+          </div>
+        </div>`
+      }).join('')}
+    </div>
+  </div>`:''}
+
+  ${done.length>0?`
+  <div>
+    <div class="eyebrow" style="margin-bottom:10px">Completed (${done.length})</div>
+    <div style="display:flex;flex-direction:column;gap:6px;opacity:0.6">
+      ${done.map(h=>`<div class="hw-row done">
+        <svg width="14" height="14" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="var(--sage-deep)" stroke-width="2" stroke-linecap="round"/></svg>
+        <div style="flex:1;min-width:0">
+          <div class="hw-title" style="font-size:13px;font-weight:450;color:var(--ink-soft)">${h.title}</div>
+          ${h.subject?`<span class="tag" style="margin-top:2px;display:inline-block">${h.subject}</span>`:''}
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="toggleHW('${h.id}')">Undo</button>
+        <button class="btn btn-ghost btn-sm" onclick="deleteHW('${h.id}')">Del</button>
+      </div>`).join('')}
+    </div>
+  </div>`:''}
+  `
+}
+
+// ── TODOS ──────────────────────────────────────────────────────────────────
+function renderTodos(){
+  const cols = state.kanbanCols
+  const todos = state.todos
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+    <div>
+      <div class="eyebrow">Kanban board</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--ink)">To-do</h2>
+    </div>
+    <button class="btn btn-primary" onclick="openTodoForm()">+ Add Task</button>
+  </div>
+  <div class="kanban-board" id="kanbanBoard">
+    ${cols.map(col=>{
+      const cards = todos.filter(t=>t.status===col.id)
+      return `<div class="kanban-col" id="col-${col.id}" ondragover="event.preventDefault();document.getElementById('col-${col.id}').classList.add('drag-over')" ondragleave="document.getElementById('col-${col.id}').classList.remove('drag-over')" ondrop="dropCard(event,'${col.id}')">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:7px">
+            <div style="width:8px;height:8px;border-radius:50%;background:${col.color};box-shadow:0 0 6px ${col.color}55"></div>
+            <span style="font-size:12.5px;font-weight:620;color:var(--ink)">${col.label}</span>
+            <span style="font-size:11px;color:var(--ink-soft);background:rgba(127,168,130,0.1);padding:1px 7px;border-radius:10px">${cards.length}</span>
+          </div>
+        </div>
+        ${cards.map(t=>{
+          const pc = t.priority==='high'?'#e05252':t.priority==='medium'?'#c9963a':'#4a7a4d'
+          return `<div class="kanban-card" draggable="true" ondragstart="dragCard(event,'${t.id}')">
+            <div style="font-size:13px;font-weight:510;color:var(--ink);margin-bottom:6px">${t.title}</div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              ${t.subject?`<span class="tag">${t.subject}</span>`:''}
+              ${t.priority?`<span style="font-size:10px;color:${pc};font-weight:600;background:${pc}18;padding:1px 6px;border-radius:4px">${t.priority}</span>`:''}
+            </div>
+            <div style="display:flex;gap:5px;margin-top:8px">
+              <button class="btn btn-ghost btn-sm" onclick="deleteTodo('${t.id}')" style="padding:3px 8px;font-size:10.5px">Del</button>
+              ${col.id!=='done'?`<button class="btn btn-primary btn-sm" onclick="moveTodo('${t.id}','done')" style="padding:3px 8px;font-size:10.5px">Done</button>`:''}
+            </div>
+          </div>`
+        }).join('')}
+      </div>`
+    }).join('')}
+  </div>
+  `
+}
+
+let dragId = null
+function dragCard(e, id){ dragId=id; e.dataTransfer.effectAllowed='move' }
+function dropCard(e, colId){
+  e.preventDefault()
+  document.querySelectorAll('.kanban-col').forEach(c=>c.classList.remove('drag-over'))
+  if(!dragId) return
+  const t = state.todos.find(x=>x.id===dragId)
+  if(t){ t.status=colId; t.completed=(colId==='done'); save('todos',state.todos); renderPage('todos') }
+  dragId=null
+}
+function moveTodo(id, colId){
+  const t = state.todos.find(x=>x.id===id)
+  if(t){ t.status=colId; t.completed=(colId==='done'); save('todos',state.todos); renderPage('todos') }
+}
+function deleteTodo(id){
+  state.todos = state.todos.filter(t=>t.id!==id)
+  save('todos',state.todos); renderPage('todos')
+}
+
+// ── PAST PAPERS ────────────────────────────────────────────────────────────
+function renderPapers(){
+  const papers = state.papers.sort((a,b)=>new Date(b.date||0)-new Date(a.date||0))
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+    <div>
+      <div class="eyebrow">Track your scores</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--ink)">Past Papers</h2>
+    </div>
+    <button class="btn btn-primary" onclick="openPaperForm()">+ Add Paper</button>
+  </div>
+  ${papers.length===0?`<div class="card" style="padding:60px;text-align:center"><div style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ink-soft)">No papers logged yet.</div></div>`:''}
+  <div style="display:flex;flex-direction:column;gap:10px">
+    ${papers.map(p=>{
+      const pct = p.score!=null&&p.max>0?Math.round((p.score/p.max)*100):null
+      const c = pct==null?'var(--ink-soft)':pct>=80?'#4a7a4d':pct>=60?'#c9963a':'#e05252'
+      const sc = subjectColor(p.subject)
+      return `<div class="card" style="padding:16px 20px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:3px;height:44px;border-radius:3px;flex-shrink:0;background:${sc}"></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600;color:var(--ink)">${p.subject} — ${p.year||'Unknown year'}</div>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:5px;flex-wrap:wrap">
+              <span class="tag">${p.subject}</span>
+              ${p.date?`<span style="font-size:11px;color:var(--ink-soft);font-family:'DM Mono',monospace">${p.date}</span>`:''}
+            </div>
+            ${p.notes?`<div style="font-size:12px;color:var(--ink-soft);margin-top:5px">${p.notes}</div>`:''}
+            ${pct!=null?`<div class="prog-bar" style="margin-top:10px;width:160px"><div class="prog-fill" style="width:${pct}%;background:linear-gradient(90deg,${c},${c}cc)"></div></div>`:''}
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            ${p.score!=null?`<div style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:${c}">${p.score}<span style="font-size:14px;color:var(--ink-soft)">/${p.max||'?'}</span></div>
+            ${pct!=null?`<div style="font-size:11px;font-weight:600;color:${c}">${pct}%</div>`:''}`:
+            '<div style="font-size:13px;color:var(--ink-soft)">No score</div>'}
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="deletePaper('${p.id}')" style="flex-shrink:0">Del</button>
+        </div>
+      </div>`
+    }).join('')}
+  </div>
+  `
+}
+
+// ── CALENDAR ───────────────────────────────────────────────────────────────
+function renderCalendar(){
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth()
+  const todayDate = now.getDate()
+  const daysInMonth = new Date(year,month+1,0).getDate()
+  const firstDay = new Date(year,month,1).getDay()
+  const monthName = now.toLocaleString('en-AU',{month:'long'})
+  const hwDates = new Set(state.homework.filter(h=>h.due_date&&!h.completed).map(h=>h.due_date))
+  const days = []
+  for(let i=0;i<firstDay;i++) days.push('<div></div>')
+  for(let d=1;d<=daysInMonth;d++){
+    const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`
+    const isToday = d===todayDate
+    const hasHW = hwDates.has(ds)
+    days.push(`<div class="cal-day${isToday?' today':''}${hasHW?' has-hw':''}">${d}</div>`)
+  }
+
+  const upcoming = state.homework.filter(h=>!h.completed&&h.due_date).sort((a,b)=>new Date(a.due_date)-new Date(b.due_date))
+
+  return `
+  <div class="eyebrow" style="margin-bottom:8px">Schedule</div>
+  <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--ink);margin-bottom:24px">Calendar</h2>
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:20px">
+    <div class="card" style="padding:22px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--ink)">${monthName} ${year}</h3>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px">
+        ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--ink-soft);padding:4px;letter-spacing:0.05em">${d}</div>`).join('')}
+      </div>
+      <div class="cal-grid">${days.join('')}</div>
+      <div style="display:flex;gap:14px;margin-top:14px;font-size:11px;color:var(--ink-soft)">
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:8px;height:8px;border-radius:50%;background:var(--sage-deep)"></div>Today</div>
+        <div style="display:flex;align-items:center;gap:5px"><div style="width:6px;height:6px;border-radius:50%;background:var(--gold)"></div>Homework due</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card" style="padding:18px">
+        <div class="eyebrow" style="margin-bottom:8px">Upcoming</div>
+        ${upcoming.length===0?`<p style="font-size:13px;color:var(--ink-soft)">No upcoming homework</p>`
+        :upcoming.slice(0,6).map(h=>{
+          const d = dueLabel(h.due_date)
+          return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(127,168,130,0.1)">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12.5px;font-weight:510;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${h.title}</div>
+              ${h.subject?`<span class="tag" style="margin-top:2px;display:inline-block">${h.subject}</span>`:''}
+            </div>
+            ${d?`<span style="font-size:10.5px;color:${d.color};font-weight:600;background:${d.bg};padding:2px 6px;border-radius:5px;flex-shrink:0">${d.label}</span>`:''}
+          </div>`
+        }).join('')}
+      </div>
+    </div>
+  </div>
+  `
+}
+
+// ── TIMER ──────────────────────────────────────────────────────────────────
+function renderTimer(){
+  const t = state.timer
+  const pct = t.secsLeft/t.total
+  const circ = 2*Math.PI*68
+  const off = circ*(1-pct)
+  const mins = Math.floor(t.secsLeft/60)
+  const secs = t.secsLeft%60
+
+  return `
+  <div class="eyebrow" style="margin-bottom:8px">Focus</div>
+  <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--ink);margin-bottom:24px">Study Timer</h2>
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:20px">
+    <div class="card" style="padding:32px;display:flex;flex-direction:column;align-items:center">
+      <!-- Presets -->
+      <div style="display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap;justify-content:center">
+        ${[{l:'25m',m:25,d:'Pomodoro'},{l:'45m',m:45,d:'Focus'},{l:'60m',m:60,d:'Deep work'},{l:'90m',m:90,d:'Flow'}].map(p=>
+          `<button class="btn btn-ghost btn-sm" onclick="setTimerPreset(${p.m})" style="${t.total===p.m*60&&!t.running?'border-color:var(--sage-deep);color:var(--sage-deep)':''}">${p.l}</button>`
+        ).join('')}
+      </div>
+      <!-- Ring -->
+      <div style="position:relative;width:180px;height:180px;margin-bottom:24px">
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          <circle cx="90" cy="90" r="68" class="timer-ring-track"/>
+          <circle cx="90" cy="90" r="68" class="timer-ring-fill"
+            stroke-dasharray="${circ}" stroke-dashoffset="${off}"
+            stroke="${t.secsLeft===0?'var(--sage)':t.running?'var(--sage-deep)':'var(--sage-mid)'}"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font-family:'DM Mono',monospace;font-size:2.4rem;font-weight:700;color:var(--ink);letter-spacing:-0.02em">${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}</div>
+          ${t.subject?`<div style="font-size:11px;color:var(--ink-soft);margin-top:3px">${t.subject}</div>`:''}
+        </div>
+      </div>
+      <!-- Subject -->
+      <select class="input" style="max-width:260px;margin-bottom:16px" id="timerSubject" onchange="state.timer.subject=this.value">
+        <option value="">No subject selected</option>
+        ${SUBJECTS.map(s=>`<option value="${s}" ${t.subject===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+      <!-- Controls -->
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" onclick="${t.running?'pauseTimer()':'startTimer()'}">${t.running?'Pause':'Start'}</button>
+        <button class="btn btn-ghost" onclick="resetTimer()">Reset</button>
+      </div>
+      ${t.secsLeft===0&&!t.running?`<div style="margin-top:16px;padding:12px 18px;border-radius:10px;background:rgba(74,122,77,0.08);border:1px solid rgba(74,122,77,0.2);color:var(--sage-deep);font-size:13px;font-weight:600;text-align:center">Session complete — well done.</div>`:''}
+    </div>
+    <!-- Session History -->
+    <div class="card" style="padding:18px">
+      <div class="eyebrow" style="margin-bottom:12px">Session History</div>
+      ${state.sessions.length===0?`<p style="font-size:13px;color:var(--ink-soft)">No sessions yet</p>`
+      :state.sessions.slice(0,10).map(s=>`<div class="history-day" style="margin-bottom:6px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${subjectColor(s.subject)};flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12.5px;font-weight:500">${s.subject||'Study session'}</div>
+          <div style="font-size:11px;color:var(--ink-soft);font-family:'DM Mono',monospace">${s.date||''}</div>
+        </div>
+        <span style="font-size:11px;font-weight:600;color:var(--sage-deep);background:rgba(74,122,77,0.1);padding:2px 8px;border-radius:5px">${s.duration}m</span>
+      </div>`).join('')}
+    </div>
+  </div>
+  `
+}
+
+function setTimerPreset(mins){
+  if(state.timer.running) return
+  state.timer.total = mins*60; state.timer.secsLeft = mins*60
+  renderPage('timer')
+}
+function startTimer(){
+  if(state.timer.running) return
+  state.timer.running = true
+  state.timer.intervalId = setInterval(()=>{
+    if(state.timer.secsLeft<=1){
+      clearInterval(state.timer.intervalId)
+      state.timer.running=false; state.timer.secsLeft=0
+      const mins = Math.round(state.timer.total/60)
+      state.sessions.unshift({id:genId(),subject:state.timer.subject,duration:mins,date:TODAY()})
+      save('sessions',state.sessions)
+      renderPage('timer')
+      return
+    }
+    state.timer.secsLeft--
+    updateTimerUI()
+  },1000)
+  renderPage('timer')
+}
+function pauseTimer(){ clearInterval(state.timer.intervalId); state.timer.running=false; renderPage('timer') }
+function resetTimer(){ pauseTimer(); state.timer.secsLeft=state.timer.total; renderPage('timer') }
+function updateTimerUI(){
+  const t = state.timer
+  const pct = t.secsLeft/t.total
+  const circ = 2*Math.PI*68
+  const off = circ*(1-pct)
+  const mins = Math.floor(t.secsLeft/60)
+  const secs = t.secsLeft%60
+  const fill = document.querySelector('.timer-ring-fill')
+  if(fill) fill.setAttribute('stroke-dashoffset', off)
+  const timeEl = document.querySelector('.timer-ring-fill')?.closest('div')?.parentElement?.querySelector('div div')
+  const allDivs = document.querySelectorAll('[style*="DM Mono"][style*="2.4rem"]')
+  if(allDivs.length) allDivs[0].textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`
+}
+
+// ── DAILY CHECK-IN ─────────────────────────────────────────────────────────
+function renderCheckin(){
+  const todayCI = getTodayCI()
+  const done = countDone(todayCI)
+  const streak = calcStreak()
+  const history = state.checkins.slice(0,14)
+
+  return `
+  <div class="eyebrow" style="margin-bottom:8px">Daily Habits</div>
+  <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--ink);margin-bottom:24px">Check-in</h2>
+  <div style="display:grid;grid-template-columns:1fr 280px;gap:20px">
+    <div class="card" style="padding:24px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div>
+          <div class="eyebrow">Today</div>
+          <h3 style="font-size:1rem;font-weight:700;color:var(--ink)">${new Date().toLocaleDateString('en-AU',{weekday:'long',month:'long',day:'numeric'})}</h3>
+        </div>
+        <div style="position:relative;width:60px;height:60px">
+          <svg width="60" height="60" viewBox="0 0 60 60">
+            <circle cx="30" cy="30" r="24" class="ring-track"/>
+            <circle cx="30" cy="30" r="24" class="ring-fill"
+              stroke="${done===5?'var(--sage-deep)':done>=3?'var(--gold)':'var(--sage)'}"
+              stroke-dasharray="${2*Math.PI*24}"
+              stroke-dashoffset="${2*Math.PI*24*(1-(done/5))}"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--ink)">${done}/5</div>
+        </div>
+      </div>
+      ${streak>0?`<div style="display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;background:rgba(201,150,58,0.1);border:1px solid rgba(201,150,58,0.22);margin-bottom:16px"><span style="font-size:12.5px;font-weight:600;color:var(--gold)">${streak} day streak</span></div>`:''}
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${CI_ITEMS.map(item=>{
+          const isDone = todayCI?.[item.key]||false
+          return `<div class="ci-item${isDone?' done':''}" onclick="toggleCI('${item.key}')">
+            <div class="ci-check">${isDone?`<svg width="11" height="11" viewBox="0 0 10 8" fill="none"><path d="M1 4l2.5 2.5L9 1" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>`:''}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13.5px;font-weight:${isDone?'600':'450'};color:${isDone?'var(--ink)':'var(--ink-mid)'}">${item.label}</div>
+              <div style="font-size:11.5px;color:var(--ink-soft)">${item.sub}</div>
+            </div>
+            <span style="font-size:11px;font-family:'DM Mono',monospace;color:${isDone?'var(--sage-deep)':'var(--ink-soft)'};background:${isDone?'rgba(74,122,77,0.1)':'rgba(127,168,130,0.08)'};padding:3px 8px;border-radius:5px">${item.time}</span>
+          </div>`
+        }).join('')}
+      </div>
+      ${done===5?`<div style="margin-top:18px;padding:14px;border-radius:12px;background:rgba(74,122,77,0.08);border:1px solid rgba(74,122,77,0.2);text-align:center"><div style="font-size:13.5px;font-weight:650;color:var(--sage-deep)">Perfect day — all 5 tasks complete.</div></div>`:''}
+    </div>
+    <!-- History -->
+    <div class="card" style="padding:18px">
+      <div class="eyebrow" style="margin-bottom:12px">History</div>
+      ${history.length===0?`<p style="font-size:13px;color:var(--ink-soft)">No history yet</p>`
+      :history.map(c=>{
+        const d = countDone(c)
+        const pct = Math.round((d/5)*100)
+        return `<div class="history-day" style="margin-bottom:6px">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.date}</div>
+            <div class="prog-bar" style="margin-top:5px"><div class="prog-fill" style="width:${pct}%"></div></div>
+          </div>
+          <span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--sage-deep);flex-shrink:0;margin-left:8px">${d}/5</span>
+        </div>`
+      }).join('')}
+    </div>
+  </div>
+  `
+}
+
+function toggleCI(key){
+  let ci = getTodayCI()
+  if(!ci){
+    ci = {id:genId(),date:TODAY(),maths:false,english:false,thinking:false,oc:false,selective:false}
+    state.checkins.unshift(ci)
+  }
+  ci[key] = !ci[key]
+  save('checkins',state.checkins)
+  renderPage(state.page)
+}
+
+// ── MODALS ─────────────────────────────────────────────────────────────────
+function openModal(html){ document.getElementById('modalContent').innerHTML=html; document.getElementById('modalBg').style.display='flex' }
+function closeModal(e){ if(e.target===document.getElementById('modalBg')||!e) document.getElementById('modalBg').style.display='none' }
+function openAddModal(){
+  const opts = {dashboard:'What would you like to add?',homework:'Add homework',todos:'Add task',papers:'Add past paper',calendar:'Add homework',timer:'',checkin:''}
+  if(state.page==='homework') openHwForm()
+  else if(state.page==='todos') openTodoForm()
+  else if(state.page==='papers') openPaperForm()
+  else openHwForm()
+}
+
+function openHwForm(){
+  openModal(`
+  <div class="eyebrow" style="margin-bottom:4px">New Entry</div>
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--ink);margin-bottom:20px">Add Homework</h3>
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <input class="input" id="hwTitle" placeholder="Assignment title" />
+    <select class="input" id="hwSubject">
+      ${SUBJECTS.map(s=>`<option value="${s}">${s}</option>`).join('')}
+    </select>
+    <input class="input" id="hwDue" type="date" placeholder="Due date" />
+    <textarea class="input" id="hwNotes" placeholder="Notes (optional)"></textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="document.getElementById('modalBg').style.display='none'">Cancel</button>
+      <button class="btn btn-primary" onclick="saveHW()">Add Homework</button>
+    </div>
+  </div>`)
+}
+
+function saveHW(){
+  const title = document.getElementById('hwTitle').value.trim()
+  if(!title) return
+  const hw = {id:genId(),title,subject:document.getElementById('hwSubject').value,due_date:document.getElementById('hwDue').value||null,notes:document.getElementById('hwNotes').value||null,completed:false,created_at:new Date().toISOString()}
+  state.homework.push(hw); save('homework',state.homework)
+  document.getElementById('modalBg').style.display='none'
+  renderPage(state.page)
+}
+
+function toggleHW(id){
+  const h = state.homework.find(x=>x.id===id)
+  if(h){ h.completed=!h.completed; save('homework',state.homework); renderPage(state.page) }
+}
+function deleteHW(id){ state.homework=state.homework.filter(x=>x.id!==id); save('homework',state.homework); renderPage(state.page) }
+
+function openTodoForm(){
+  openModal(`
+  <div class="eyebrow" style="margin-bottom:4px">New Task</div>
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--ink);margin-bottom:20px">Add To-do</h3>
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <input class="input" id="todoTitle" placeholder="Task title"/>
+    <select class="input" id="todoSubject"><option value="">No subject</option>${SUBJECTS.map(s=>`<option value="${s}">${s}</option>`).join('')}</select>
+    <select class="input" id="todoPrio"><option value="low">Low priority</option><option value="medium">Medium priority</option><option value="high">High priority</option></select>
+    <select class="input" id="todoCol">${state.kanbanCols.map(c=>`<option value="${c.id}">${c.label}</option>`).join('')}</select>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="document.getElementById('modalBg').style.display='none'">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTodo()">Add Task</button>
+    </div>
+  </div>`)
+}
+
+function saveTodo(){
+  const title = document.getElementById('todoTitle').value.trim()
+  if(!title) return
+  const colId = document.getElementById('todoCol').value
+  const todo = {id:genId(),title,subject:document.getElementById('todoSubject').value||null,priority:document.getElementById('todoPrio').value,status:colId,completed:colId==='done',created_at:new Date().toISOString()}
+  state.todos.push(todo); save('todos',state.todos)
+  document.getElementById('modalBg').style.display='none'
+  renderPage(state.page)
+}
+
+function openPaperForm(){
+  openModal(`
+  <div class="eyebrow" style="margin-bottom:4px">Log Result</div>
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--ink);margin-bottom:20px">Add Past Paper</h3>
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <select class="input" id="pSubject">${SUBJECTS.map(s=>`<option value="${s}">${s}</option>`).join('')}</select>
+    <input class="input" id="pYear" placeholder="Year (e.g. 2023)" type="number"/>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <input class="input" id="pScore" placeholder="Score" type="number"/>
+      <input class="input" id="pMax" placeholder="Max score" type="number" value="100"/>
+    </div>
+    <input class="input" id="pDate" type="date"/>
+    <textarea class="input" id="pNotes" placeholder="Notes (optional)"></textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="document.getElementById('modalBg').style.display='none'">Cancel</button>
+      <button class="btn btn-primary" onclick="savePaper()">Add Paper</button>
+    </div>
+  </div>`)
+}
+
+function savePaper(){
+  const paper = {
+    id:genId(),
+    subject:document.getElementById('pSubject').value,
+    year:document.getElementById('pYear').value||null,
+    score:document.getElementById('pScore').value?Number(document.getElementById('pScore').value):null,
+    max:document.getElementById('pMax').value?Number(document.getElementById('pMax').value):100,
+    date:document.getElementById('pDate').value||null,
+    notes:document.getElementById('pNotes').value||null,
+  }
+  state.papers.push(paper); save('papers',state.papers)
+  document.getElementById('modalBg').style.display='none'
+  renderPage(state.page)
+}
+function deletePaper(id){ state.papers=state.papers.filter(p=>p.id!==id); save('papers',state.papers); renderPage(state.page) }
+
+// ── COUNTDOWN UPDATE ───────────────────────────────────────────────────────
+function afterRender(page){
+  if(page==='dashboard'){
+    const nextHW = state.homework.filter(h=>!h.completed&&h.due_date).sort((a,b)=>new Date(a.due_date)-new Date(b.due_date))[0]
+    if(nextHW){
+      if(state.countdown.intervalId) clearInterval(state.countdown.intervalId)
+      const tick = ()=>{
+        const target = new Date(nextHW.due_date+'T23:59:59').getTime()
+        const diff = Math.max(0,target-Date.now())
+        const d=Math.floor(diff/86400000), h=Math.floor((diff%86400000)/3600000), m=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000)
+        const dEl=document.getElementById('cd_d'), hEl=document.getElementById('cd_h'), mEl=document.getElementById('cd_m'), sEl=document.getElementById('cd_s')
+        if(dEl){dEl.textContent=String(d).padStart(2,'0');hEl.textContent=String(h).padStart(2,'0');mEl.textContent=String(m).padStart(2,'0');sEl.textContent=String(s).padStart(2,'0')}
+      }
+      tick()
+      state.countdown.intervalId = setInterval(tick,1000)
+    }
+  }
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+navigate('dashboard')
+</script>
+</body>
+</html>
