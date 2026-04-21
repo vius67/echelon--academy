@@ -30,26 +30,7 @@
     background: var(--cream);
     color: var(--ink);
     overflow-x: hidden;
-    cursor: none;
-  }
-
-  /* CUSTOM CURSOR */
-  .cursor-dot {
-    display: none;
-  }
-  .cursor-ring {
-    width: 36px; height: 36px;
-    border: 1.5px solid var(--gold);
-    border-radius: 50%;
-    position: fixed; top: 0; left: 0;
-    pointer-events: none; z-index: 9998;
-    transform: translate(-50%, -50%);
-    transition: transform 0.08s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
-  }
-  .cursor-ring.hovering {
-    width: 56px; height: 56px;
-    border-color: var(--sage);
-    opacity: 0.7;
+    cursor: auto;
   }
 
   /* SCROLL PROGRESS */
@@ -545,8 +526,251 @@
   }
   @keyframes shimmer { to { left: 100%; } }
 
-  /* TESTIMONIALS */
-  .testimonials { background: var(--cream-warm); }
+  /* WHATSAPP SECTION */
+  .whatsapp { background: var(--cream); }
+  .wa-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+    margin-top: 3rem;
+  }
+  .wa-left {}
+  .wa-left p {
+    font-size: 1rem;
+    color: var(--ink-soft);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+  }
+  .wa-features { display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem; }
+  .wa-feature {
+    display: flex; align-items: flex-start; gap: 1rem;
+    padding: 1.2rem 1.4rem;
+    background: var(--white);
+    border: 1px solid rgba(127,168,130,0.2);
+    border-radius: 6px;
+    opacity: 0; transform: translateX(-20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .wa-feature.visible { opacity: 1; transform: translateX(0); }
+  .wa-feature:nth-child(2).visible { transition-delay: 0.12s; }
+  .wa-feature:nth-child(3).visible { transition-delay: 0.24s; }
+  .wa-feature-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--sage-deep); flex-shrink: 0; margin-top: 6px;
+  }
+  .wa-feature-text strong {
+    display: block; font-size: 0.9rem; color: var(--ink); margin-bottom: 0.2rem;
+  }
+  .wa-feature-text span { font-size: 0.82rem; color: var(--ink-soft); line-height: 1.6; }
+  .wa-right {
+    background: var(--ink);
+    border-radius: 16px;
+    padding: 2rem;
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
+  }
+  .wa-right.visible { opacity: 1; transform: translateY(0); }
+  .wa-chat-header {
+    display: flex; align-items: center; gap: 0.8rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    margin-bottom: 1.2rem;
+  }
+  .wa-chat-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--sage-deep);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem; color: var(--white);
+  }
+  .wa-chat-info strong { display: block; font-size: 0.85rem; color: var(--cream); }
+  .wa-chat-info span { font-size: 0.7rem; color: var(--sage-light); font-family: 'DM Mono', monospace; }
+  .wa-messages { display: flex; flex-direction: column; gap: 0.8rem; }
+  .wa-msg {
+    max-width: 80%; padding: 0.7rem 1rem;
+    border-radius: 10px; font-size: 0.82rem; line-height: 1.5;
+  }
+  .wa-msg.them { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); align-self: flex-start; border-bottom-left-radius: 2px; }
+  .wa-msg.us { background: var(--sage-deep); color: var(--white); align-self: flex-end; border-bottom-right-radius: 2px; }
+  .wa-msg-time { font-size: 0.6rem; color: rgba(255,255,255,0.3); margin-top: 0.2rem; font-family: 'DM Mono', monospace; }
+
+  /* DIFFERENTIATION SECTION */
+  .diff { background: var(--ink); padding: 7rem 4rem; }
+  .diff .section-label { color: var(--sage-light); }
+  .diff .section-title { color: var(--cream); max-width: 600px; }
+  .diff .section-title em { color: var(--sage-light); }
+  .diff-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 3.5rem;
+  }
+  .diff-card {
+    padding: 2.2rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.03);
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease, background 0.3s;
+  }
+  .diff-card:hover { background: rgba(127,168,130,0.07); border-color: rgba(127,168,130,0.2); }
+  .diff-card.visible { opacity: 1; transform: translateY(0); }
+  .diff-card:nth-child(2).visible { transition-delay: 0.1s; }
+  .diff-card:nth-child(3).visible { transition-delay: 0.2s; }
+  .diff-card:nth-child(4).visible { transition-delay: 0.3s; }
+  .diff-card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+  }
+  .diff-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: var(--cream);
+    margin-bottom: 0.7rem;
+    font-weight: 600;
+  }
+  .diff-card p { font-size: 0.88rem; color: rgba(255,255,255,0.45); line-height: 1.75; }
+  .diff-vs {
+    margin-top: 3rem;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    overflow: hidden;
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.6s ease 0.4s, transform 0.6s ease 0.4s;
+  }
+  .diff-vs.visible { opacity: 1; transform: translateY(0); }
+  .diff-vs-header {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .diff-vs-header div {
+    padding: 1rem 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .diff-vs-header div:first-child { color: rgba(255,255,255,0.3); }
+  .diff-vs-header div:nth-child(2) { color: var(--sage-light); border-left: 1px solid rgba(255,255,255,0.06); text-align: center; }
+  .diff-vs-header div:last-child { color: rgba(255,255,255,0.25); border-left: 1px solid rgba(255,255,255,0.06); text-align: center; }
+  .diff-vs-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .diff-vs-row:last-child { border-bottom: none; }
+  .diff-vs-row div { padding: 0.9rem 1.5rem; font-size: 0.83rem; }
+  .diff-vs-row div:first-child { color: rgba(255,255,255,0.45); }
+  .diff-vs-row div:nth-child(2) { color: var(--sage-light); border-left: 1px solid rgba(255,255,255,0.04); text-align: center; font-weight: 500; }
+  .diff-vs-row div:last-child { color: rgba(255,255,255,0.2); border-left: 1px solid rgba(255,255,255,0.04); text-align: center; }
+
+  /* PRICING SECTION */
+  .pricing { background: var(--cream-warm); }
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    max-width: 760px;
+    margin: 3rem auto 0;
+  }
+  .price-card {
+    background: var(--white);
+    border: 1.5px solid rgba(127,168,130,0.2);
+    border-radius: 10px;
+    padding: 2.5rem;
+    text-align: center;
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.3s, border-color 0.3s;
+  }
+  .price-card.visible { opacity: 1; transform: translateY(0); }
+  .price-card:nth-child(2).visible { transition-delay: 0.15s; }
+  .price-card:hover { box-shadow: 0 12px 40px rgba(74,122,77,0.12); border-color: var(--sage); }
+  .price-card.featured {
+    border-color: var(--sage-deep);
+    background: var(--ink);
+    position: relative;
+  }
+  .price-card.featured:hover { box-shadow: 0 12px 40px rgba(26,46,27,0.25); }
+  .price-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--sage-deep);
+    background: var(--sage-pale);
+    padding: 0.3rem 0.9rem;
+    border-radius: 100px;
+    display: inline-block;
+    margin-bottom: 1.2rem;
+  }
+  .price-card.featured .price-tag { background: rgba(127,168,130,0.15); color: var(--sage-light); }
+  .price-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+  .price-card.featured .price-name { color: var(--cream); }
+  .price-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.2rem;
+    font-weight: 900;
+    color: var(--sage-deep);
+    line-height: 1;
+    margin: 1rem 0 0.3rem;
+  }
+  .price-card.featured .price-amount { color: var(--sage-light); }
+  .price-per {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 1.8rem;
+  }
+  .price-card.featured .price-per { color: rgba(255,255,255,0.35); }
+  .price-features { list-style: none; text-align: left; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.7rem; }
+  .price-features li {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    padding-left: 1.2rem;
+    position: relative;
+    line-height: 1.5;
+  }
+  .price-card.featured .price-features li { color: rgba(255,255,255,0.5); }
+  .price-features li::before {
+    content: '—';
+    position: absolute; left: 0;
+    color: var(--sage);
+    font-size: 0.7rem;
+  }
+  .price-card.featured .price-features li::before { color: var(--sage-light); }
+  .price-btn {
+    width: 100%;
+    padding: 0.85rem;
+    border: 1.5px solid var(--sage-deep);
+    border-radius: 3px;
+    background: transparent;
+    color: var(--sage-deep);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.25s, color 0.25s;
+  }
+  .price-btn:hover { background: var(--sage-deep); color: var(--white); }
+  .price-card.featured .price-btn {
+    background: var(--sage-deep);
+    color: var(--white);
+    border-color: var(--sage-deep);
+  }
+  .price-card.featured .price-btn:hover { background: var(--sage); border-color: var(--sage); }
   .testi-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -746,8 +970,6 @@
 </head>
 <body>
 
-<div class="cursor-dot" id="cursorDot"></div>
-<div class="cursor-ring" id="cursorRing"></div>
 <div class="progress-bar" id="progressBar"></div>
 
 <!-- LOADER -->
@@ -762,9 +984,9 @@
   <a class="nav-logo" href="#">ECHE<span>LON</span></a>
   <div class="nav-links">
     <a href="#subjects">Subjects</a>
-    <a href="#why">Why Us</a>
+    <a href="#difference">Why Us</a>
+    <a href="#pricing">Pricing</a>
     <a href="#tutors">Tutors</a>
-    <a href="#testimonials">Reviews</a>
     <a href="#book" class="nav-cta">Book Now</a>
   </div>
 </nav>
@@ -776,10 +998,10 @@
   <div class="particles" id="particles"></div>
 
   <div class="float-badges">
-    <div class="float-badge">🏆 Rank #1 School in NSW</div>
-    <div class="float-badge">📋 OC &amp; Selective specialists</div>
-    <div class="float-badge">✅ K–7 focused tutoring</div>
-    <div class="float-badge">⭐ 97% satisfaction rate</div>
+    <div class="float-badge">Rank #1 School in NSW</div>
+    <div class="float-badge">OC &amp; Selective specialists</div>
+    <div class="float-badge">K–7 focused tutoring</div>
+    <div class="float-badge">97% satisfaction rate</div>
   </div>
 
   <div class="hero-badge">North Sydney Boys High School · OC &amp; Selective Specialists</div>
@@ -823,12 +1045,12 @@
   <div class="section-label">What we teach</div>
   <div class="section-title">Every subject. <em>Syllabus-perfect.</em></div>
   <div class="subjects-grid">
-    <div class="subject-card"><div class="subject-icon">📐</div><div class="subject-name">Mathematics</div><div class="subject-hook">From times tables to advanced problem solving — built for OC and Selective exam formats.</div></div>
-    <div class="subject-card"><div class="subject-icon">✍️</div><div class="subject-name">English</div><div class="subject-hook">Reading comprehension, creative writing, and the exact skills examiners reward.</div></div>
-    <div class="subject-card"><div class="subject-icon">🧠</div><div class="subject-name">Thinking Skills</div><div class="subject-hook">Abstract reasoning, patterns, and logic — the stuff that makes or breaks a selective test.</div></div>
-    <div class="subject-card"><div class="subject-icon">🎯</div><div class="subject-name">OC Prep</div><div class="subject-hook">Full OC exam preparation. Past papers, technique, and the confidence to perform on the day.</div></div>
-    <div class="subject-card"><div class="subject-icon">🏆</div><div class="subject-name">Selective Prep</div><div class="subject-hook">Targeted selective school exam coaching from students who got in to the #1 school in NSW.</div></div>
-    <div class="subject-card"><div class="subject-icon">🔬</div><div class="subject-name">General Ability</div><div class="subject-hook">Speed, accuracy, and strategy for the general ability sections that catch most students off guard.</div></div>
+    <div class="subject-card"><div class="subject-name">Mathematics</div><div class="subject-hook">From times tables to advanced problem solving — built for OC and Selective exam formats.</div></div>
+    <div class="subject-card"><div class="subject-name">English</div><div class="subject-hook">Reading comprehension, creative writing, and the exact skills examiners reward.</div></div>
+    <div class="subject-card"><div class="subject-name">Thinking Skills</div><div class="subject-hook">Abstract reasoning, patterns, and logic — the stuff that makes or breaks a selective test.</div></div>
+    <div class="subject-card"><div class="subject-name">OC Prep</div><div class="subject-hook">Full OC exam preparation. Past papers, technique, and the confidence to perform on the day.</div></div>
+    <div class="subject-card"><div class="subject-name">Selective Prep</div><div class="subject-hook">Targeted selective school exam coaching from students who got in to the #1 school in NSW.</div></div>
+    <div class="subject-card"><div class="subject-name">General Ability</div><div class="subject-hook">Speed, accuracy, and strategy for the general ability sections that catch most students off guard.</div></div>
   </div>
 </section>
 
@@ -839,17 +1061,17 @@
   <div class="why-divider" id="whyDivider"></div>
   <div class="why-cols">
     <div class="why-col">
-      <div class="why-icon">🎓</div>
+      <div class="why-icon"></div>
       <h3>We got in — we'll get them in</h3>
       <p>Every one of our tutors sat the OC and Selective exams and made it to NSW's #1 school. We know the test from the inside.</p>
     </div>
     <div class="why-col">
-      <div class="why-icon">📋</div>
+      <div class="why-icon"></div>
       <h3>Exam-specific, no fluff</h3>
       <p>Every session is built around what's actually tested in OC and Selective exams. Past papers, marking schemes, time strategies — all of it.</p>
     </div>
     <div class="why-col">
-      <div class="why-icon">🏆</div>
+      <div class="why-icon"></div>
       <h3>Selective school standard</h3>
       <p>We set the benchmark at the top school in NSW. Then we help K–7 students rise to meet it before the exam day comes.</p>
     </div>
@@ -920,6 +1142,152 @@
   </div>
 </section>
 
+<!-- WHATSAPP -->
+<section class="whatsapp" id="contact">
+  <div class="section-label">Always on</div>
+  <div class="section-title">Direct access. <em>No waiting.</em></div>
+  <div class="wa-grid">
+    <div class="wa-left">
+      <p>Most tutoring centres make you wait days to hear back. We don't. Every student and parent gets added to a dedicated WhatsApp group with their tutor — available anytime for questions, progress updates, or exam panic at 10pm the night before a test.</p>
+      <p>We know how stressful this period is. So we stay reachable — because good tutoring doesn't stop when the session ends.</p>
+      <div class="wa-features">
+        <div class="wa-feature">
+          <div class="wa-feature-dot"></div>
+          <div class="wa-feature-text">
+            <strong>Student — Tutor group</strong>
+            <span>Direct line to your tutor. Ask questions between sessions, get feedback on practice work, and stay on track.</span>
+          </div>
+        </div>
+        <div class="wa-feature">
+          <div class="wa-feature-dot"></div>
+          <div class="wa-feature-text">
+            <strong>Parent — Tutor group</strong>
+            <span>Parents are kept fully in the loop. Progress updates, session notes, and honest feedback — no guessing how your child is going.</span>
+          </div>
+        </div>
+        <div class="wa-feature">
+          <div class="wa-feature-dot"></div>
+          <div class="wa-feature-text">
+            <strong>Available anytime</strong>
+            <span>We respond. Whether it's a quick question or a full concept walkthrough, we're here outside of session hours.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wa-right" id="waRight">
+      <div class="wa-chat-header">
+        <div class="wa-chat-avatar">E</div>
+        <div class="wa-chat-info">
+          <strong>Echelon — Aarav &amp; Mia</strong>
+          <span>Tutor · Student · Parent</span>
+        </div>
+      </div>
+      <div class="wa-messages">
+        <div class="wa-msg them">Hi Aarav, Mia struggled with the reading comprehension section today — any tips?<div class="wa-msg-time">8:42 PM</div></div>
+        <div class="wa-msg us">Of course — the trick is to read the question first, then scan for keywords. I'll send through a practice sheet tonight.<div class="wa-msg-time">8:45 PM</div></div>
+        <div class="wa-msg them">That would be amazing, thank you!<div class="wa-msg-time">8:46 PM</div></div>
+        <div class="wa-msg us">Also Mia — great work on the abstract reasoning today, your speed is improving a lot.<div class="wa-msg-time">8:47 PM</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIFFERENTIATION -->
+<section class="diff" id="difference">
+  <div class="section-label">The Echelon difference</div>
+  <div class="section-title">Not another <em>money-farming tutoring centre.</em></div>
+  <div class="diff-grid">
+    <div class="diff-card">
+      <div class="diff-card-label">First-hand experience</div>
+      <h3>We sat the exact same exams</h3>
+      <p>Every tutor at Echelon went through OC and Selective testing themselves and got into NSW's top school. We're not reciting a textbook — we're telling you what actually worked for us, the shortcuts that save time, and the traps that cost marks. That's knowledge no adult tutor can replicate.</p>
+    </div>
+    <div class="diff-card">
+      <div class="diff-card-label">Real strategy</div>
+      <h3>Techniques that actually worked</h3>
+      <p>We teach the specific methods we used — how to pace yourself through a general ability paper, how to structure a creative writing response under time pressure, how to eliminate wrong answers fast. Not generic advice. The exact things we did that moved the needle.</p>
+    </div>
+    <div class="diff-card">
+      <div class="diff-card-label">No filler</div>
+      <h3>Small cohorts, genuine attention</h3>
+      <p>Large tutoring chains pack 20 students into a room and call it personalised. We keep sessions small and focused. Your child isn't a number filling a timeslot — we remember where they struggled last week and we start there this week.</p>
+    </div>
+    <div class="diff-card">
+      <div class="diff-card-label">Honest</div>
+      <h3>We tell you where you actually stand</h3>
+      <p>Other centres keep students enrolled by overpromising. We give parents and students an honest read — where you're strong, where there's a gap, and exactly what needs to happen before the exam. You deserve the truth, not a sales pitch.</p>
+    </div>
+  </div>
+  <div class="diff-vs" id="diffVs">
+    <div class="diff-vs-header">
+      <div>What to expect</div>
+      <div>Echelon</div>
+      <div>Big tutoring chains</div>
+    </div>
+    <div class="diff-vs-row">
+      <div>Tutor sat the exam themselves</div>
+      <div>Yes — every tutor</div>
+      <div>Rarely</div>
+    </div>
+    <div class="diff-vs-row">
+      <div>WhatsApp access between sessions</div>
+      <div>Always included</div>
+      <div>No</div>
+    </div>
+    <div class="diff-vs-row">
+      <div>Session size</div>
+      <div>1-on-1</div>
+      <div>Often 10–20 students</div>
+    </div>
+    <div class="diff-vs-row">
+      <div>Honest progress feedback</div>
+      <div>Every session</div>
+      <div>Rarely</div>
+    </div>
+    <div class="diff-vs-row">
+      <div>Strategies from lived experience</div>
+      <div>Core to every lesson</div>
+      <div>Generic curriculum</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-label">Pricing</div>
+  <div class="section-title" style="text-align:center; max-width:100%;">Simple. <em>Transparent.</em></div>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-tag">OC Preparation</div>
+      <div class="price-name">OC Prep</div>
+      <div class="price-amount">$45</div>
+      <div class="price-per">per session · 1-on-1</div>
+      <ul class="price-features">
+        <li>Full OC exam curriculum coverage</li>
+        <li>Maths, English &amp; General Ability</li>
+        <li>Past paper walkthroughs</li>
+        <li>WhatsApp access between sessions</li>
+        <li>Parent progress updates</li>
+      </ul>
+      <button class="price-btn">Book OC Session</button>
+    </div>
+    <div class="price-card featured">
+      <div class="price-tag">Selective Preparation</div>
+      <div class="price-name">Selective Prep</div>
+      <div class="price-amount">$50</div>
+      <div class="price-per">per session · 1-on-1</div>
+      <ul class="price-features">
+        <li>Full Selective exam curriculum coverage</li>
+        <li>Advanced Maths, English &amp; Thinking Skills</li>
+        <li>Timed past paper practice</li>
+        <li>WhatsApp access between sessions</li>
+        <li>Parent progress updates</li>
+      </ul>
+      <button class="price-btn">Book Selective Session</button>
+    </div>
+  </div>
+</section>
+
 <!-- TESTIMONIALS -->
 <section class="testimonials" id="testimonials">
   <div class="section-label">What they say</div>
@@ -927,18 +1295,18 @@
   <div class="testi-grid">
     <div class="testi-card">
       <div class="testi-stars">★★★★★</div>
-      <div class="testi-quote">"My Physics grade jumped an entire band after just three sessions. They explained Newton's laws better than my actual teacher."</div>
-      <div class="testi-author">Year 10 Student · Chatswood HS</div>
+      <div class="testi-quote">"My son got into his first choice selective school after 8 weeks with Echelon. The WhatsApp access was a game changer — Aarav would reply within minutes."</div>
+      <div class="testi-author">Parent · North Shore</div>
     </div>
     <div class="testi-card">
       <div class="testi-stars">★★★★★</div>
-      <div class="testi-quote">"Finally understood Konjunktiv II. Sam made it click in one hour after months of confusion. Worth every cent."</div>
-      <div class="testi-author">Year 10 Student · Knox Grammar</div>
+      <div class="testi-quote">"Way better than the big tutoring centres. They actually remembered where I struggled week to week and focused on that. Felt like they genuinely cared."</div>
+      <div class="testi-author">Year 6 Student · OC Candidate</div>
     </div>
     <div class="testi-card">
       <div class="testi-stars">★★★★★</div>
-      <div class="testi-quote">"These guys know exactly what examiners want. My essays went from Cs to As. It's a different level of tutoring."</div>
-      <div class="testi-author">Year 11 Student · Pymble Ladies</div>
+      <div class="testi-quote">"My daughter's abstract reasoning improved dramatically. The techniques they taught were practical and specific — not the vague advice you get everywhere else."</div>
+      <div class="testi-author">Parent · Chatswood</div>
     </div>
   </div>
 </section>
@@ -975,25 +1343,7 @@
   setTimeout(() => loader.classList.add('exit'), 2000);
   setTimeout(() => loader.style.display = 'none', 2800);
 
-  // CURSOR
-  const dot = document.getElementById('cursorDot');
-  const ring = document.getElementById('cursorRing');
-  let ringX = 0, ringY = 0, dotX = 0, dotY = 0;
-  document.addEventListener('mousemove', e => {
-    dotX = e.clientX; dotY = e.clientY;
-    dot.style.left = dotX + 'px'; dot.style.top = dotY + 'px';
-  });
-  function animateRing() {
-    ringX += (dotX - ringX) * 0.12;
-    ringY += (dotY - ringY) * 0.12;
-    ring.style.left = ringX + 'px'; ring.style.top = ringY + 'px';
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
-  document.querySelectorAll('button, a, .subject-card, .tutor-card, .testi-card').forEach(el => {
-    el.addEventListener('mouseenter', () => ring.classList.add('hovering'));
-    el.addEventListener('mouseleave', () => ring.classList.remove('hovering'));
-  });
+  // CURSOR — normal system cursor, no JS needed
 
   // PROGRESS BAR
   const bar = document.getElementById('progressBar');
@@ -1023,7 +1373,7 @@
     });
   }, { threshold: 0.15 });
 
-  document.querySelectorAll('.stat-item, .subject-card, .why-col, .tutor-card, .testi-card, .why-divider, .cta-pre, .cta-title, .cta-sub, .cta-btn-wrap').forEach(el => observer.observe(el));
+  document.querySelectorAll('.stat-item, .subject-card, .why-col, .tutor-card, .testi-card, .why-divider, .cta-pre, .cta-title, .cta-sub, .cta-btn-wrap, .wa-feature, #waRight, .diff-card, #diffVs, .price-card').forEach(el => observer.observe(el));
 
   // COUNT UP
   const countEls = document.querySelectorAll('.count');
